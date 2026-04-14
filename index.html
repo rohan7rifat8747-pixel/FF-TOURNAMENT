@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="app-title">𝗙𝖋 𝚃𝙾𝚄𝚁𝙽𝙰𝙼𝙴𝙽𝚃 🪽</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg: #f4f7f6; --green: #10b981; --deep-green: #064e3b; --red: #ef4444; --blue: #0088cc; --dark: #0f172a; --gold: #ffeb3b; }
+        * { font-weight: 900 !important; }
+        body { background: var(--bg); font-family: 'Poppins', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; color: #000; }
+        .scrolling-notice { width: 100%; height: 22px; background: var(--blue); color: white; overflow: hidden; position: sticky; top: 0; z-index: 2000; font-size: 0.8rem; line-height: 22px; border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .top-bar { background: linear-gradient(135deg, var(--deep-green), var(--green)); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .top-bar .title { font-family: 'Orbitron'; color: white; font-size: 1rem; }
+        .bal-box { background: white; color: var(--deep-green); padding: 5px 12px; border-radius: 15px; border: 2px solid var(--gold); font-size: 0.9rem; }
+        
+        /* Slider Styling */
+        .slider-container { width: 100%; height: 200px; overflow: hidden; position: relative; background: #000; touch-action: pan-x; }
+        .slides-wrapper { display: flex; transition: transform 0.4s ease-out; height: 100%; width: 100%; }
+        .slides-wrapper img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; pointer-events: auto; cursor: pointer; }
+        .slider-dots { position: absolute; bottom: 8px; width: 100%; display: flex; justify-content: center; gap: 6px; z-index: 10; }
+        .dot { width: 7px; height: 7px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: var(--gold); width: 18px; border-radius: 10px; }
+
+        .match-card { background: var(--deep-green); color: white; border-radius: 15px; margin: 12px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); }
+        .m-header { display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.3); font-size: 0.75rem; color: var(--gold); }
+        .m-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 10px; background: rgba(0,0,0,0.15); border-radius: 10px; margin: 8px; font-size: 0.8rem; }
+        .colored-card { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 12px 18px; border-radius: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.1); cursor: pointer; font-size: 0.9rem; }
+        .prize-btn { background: var(--gold); color: black; padding: 8px; text-align: center; margin: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
+        .prize-details { display: none; background: rgba(255,255,255,0.1); padding: 10px; margin: 0 15px 10px; border-radius: 8px; text-align: left; font-size: 0.8rem; line-height: 1.6; border: 1px solid rgba(255,255,255,0.2); white-space: pre-wrap; }
+        
+        /* Rules UI Styling */
+        .rules-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+        .rule-btn { padding: 15px; border-radius: 12px; text-align: center; font-size: 0.9rem; color: white; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-br { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .btn-cs { background: linear-gradient(45deg, #5eeff5, #4568dc); }
+        .btn-lw { background: linear-gradient(45deg, #f9d423, #ff4e50); }
+        .rule-display-box { display: none; margin-top: 15px; padding: 15px; border-radius: 15px; background: #fff; color: #333; border-left: 5px solid var(--deep-green); box-shadow: inset 0 0 10px rgba(0,0,0,0.05); white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--deep-green); margin-top: 10px; box-sizing: border-box; font-size: 0.9rem; }
+        .big-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; color: white; margin-top: 12px; cursor: pointer; font-size: 0.95rem; }
+        .page { display: none; padding: 12px; animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { opacity: 0; } to { opacity: 1; } }
+        .active-page { display: block; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #555; font-size: 0.7rem; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--deep-green); transform: scale(1.1); }
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 4000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 100%; max-width: 320px; }
+        .page-notice { font-size: 0.8rem; margin: 10px 0; color: #444; border-left: 4px solid var(--deep-green); padding-left: 10px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="scrolling-notice"><marquee id="admin-notice">আমাদের   F𝖋 𝚃𝙾𝚄𝚁𝙽𝙰𝙼𝙴𝙽𝚃 app এ আপনাকে স্বাগতম..!! 💝</marquee></div>
+
+<div id="tg-modal" class="modal-overlay">
+    <div class="modal-content">
+        <i class="fab fa-telegram" style="font-size: 3rem; color: #0088cc; margin-bottom: 15px;"></i>
+        <p style="font-size: 0.9rem; color: #333;">আপনি সফলভাবে জয়েন করেছেন, আমাদের apps এর সকল আপডেট পেতে আমাদের টেলিগ্রাম চ্যানালে জয়েন করুন,,👇👇</p>
+        <button class="big-btn btn-tg-join" style="background: #0088cc; margin-top: 15px;">TELEGRAM JOIN NOW</button>
+        <button class="big-btn" style="background: #666; margin-top: 10px;" onclick="closeTgModal()">Already join to skip</button>
+    </div>
+</div>
+
+<div id="auth-screen">
+    <h2 class="app-title" style="color:var(--deep-green); font-family:'Orbitron';">𝐖𝐄𝐋𝐂𝐎𝐌𝐄</h2>
+    <div id="login-form" style="width:100%;">
+        <p style="font-size:0.8rem; text-align:center; color:#555;">সঠিক ফোন নাম্বার ও পাসওয়ার্ড দিয়ে লগইন করুন।</p>
+        <input type="number" id="l-phone" placeholder="ফোন নাম্বার">
+        <input type="password" id="l-pass" placeholder="পাসওয়ার্ড">
+        <button class="big-btn" style="background:var(--deep-green)" onclick="login()">LOGIN</button>
+        <p onclick="toggleAuth('reg')" style="text-align:center; margin-top:20px; color:var(--blue)">অ্যাকাউন্ট নেই? রেজিস্ট্রেশন করুন</p>
+    </div>
+    <div id="reg-form" style="width:100%; display:none;">
+        <p style="font-size:0.75rem; text-align:center; color:#555;">রেজিস্ট্রেশন নিয়ম: ১১ ডিজিটের নাম্বার দিন এবং কমপক্ষে ৬ সংখ্যার পাসওয়ার্ড দিন। রেফার কোড থাকলে দিন নাহলে খালি রাখুন।</p>
+        <input type="text" id="r-name" placeholder="আপনার নাম">
+        <input type="number" id="r-phone" placeholder="ফোন নাম্বার">
+        <input type="password" id="r-pass" placeholder="পাসওয়ার্ড">
+        <input type="number" id="r-ref" placeholder="রেফার নাম্বার (ঐচ্ছিক)">
+        <button class="big-btn" style="background:var(--blue)" onclick="register()">REGISTER</button>
+        <p onclick="toggleAuth('login')" style="text-align:center; margin-top:20px; color:var(--deep-green)">লগইন করুন</p>
+    </div>
+</div>
+
+<div id="main-app" style="display:none;">
+    <div id="play-header">
+        <div class="top-bar"><div class="title app-title">𝗙𝖋 𝚃𝙾𝚄𝚁𝙽𝙰𝙼𝙴𝙽𝚃 🪽</div><div class="bal-box" onclick="nav('profile')">৳ <span id="u-bal">0</span></div></div>
+        <div id="home-slider" class="slider-container">
+            <div class="slides-wrapper" id="slider-wrapper"></div>
+            <div class="slider-dots" id="slider-dots"></div>
+        </div>
+    </div>
+
+    <div id="play" class="page active-page">
+        <div id="cat-view">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+                <div onclick="loadMatches('br')" style="background:white; border-radius:15px; text-align:center; padding-bottom:8px; box-shadow:0 3px 8px rgba(0,0,0,0.05);"><img src="https://i.ibb.co/ch40Df7Q/br-rank.jpg" style="width:100%; height:100px; border-radius:15px 15px 0 0; object-fit:cover;"><b>BR RANK</b></div>
+                <div onclick="loadMatches('cs')" style="background:white; border-radius:15px; text-align:center; padding-bottom:8px; box-shadow:0 3px 8px rgba(0,0,0,0.05);"><img src="https://i.ibb.co/0VCjZMvc/cs-rank.jpg" style="width:100%; height:100px; border-radius:15px 15px 0 0; object-fit:cover;"><b>CS RANK</b></div>
+                <div onclick="loadMatches('lw')" style="background:white; border-radius:15px; text-align:center; padding-bottom:8px; box-shadow:0 3px 8px rgba(0,0,0,0.05);"><img src="https://i.ibb.co/6JPDRbvq/lone-wolf.jpg" style="width:100%; height:100px; border-radius:15px 15px 0 0; object-fit:cover;"><b>LONE WOLF</b></div>
+                <div onclick="nav('tgPage')" style="background:var(--blue); color:white; border-radius:15px; display:flex; flex-direction:column; justify-content:center; align-items:center; padding-top:10px;"><i class="fab fa-telegram" style="font-size:1.3rem"></i><b class="txt-tg-name">Telegram Join</b></div>
+            </div>
+            <div class="btn-support-admin" style="background:var(--deep-green); color:white; border-radius:12px; padding:15px; margin-top:15px; text-align:center; box-shadow:0 3px 8px rgba(0,0,0,0.1); cursor:pointer;"><b class="txt-support-name">Any support to admin</b></div>
+        </div>
+        <div id="match-view" style="display:none;"><button onclick="backToPlay()" style="border:none; background:none; padding:10px;"><i class="fas fa-arrow-left"></i> ব্যাক</button><div id="matches-here"></div></div>
+    </div>
+
+    <div id="history" class="page"><h3 style="text-align:center;">লেনদেন ইতিহাস</h3><div id="all-history-list"></div></div>
+    
+    <div id="rules" class="page">
+        <h3 style="text-align:center; color: var(--deep-green);">📜 GAME RULES</h3>
+        <div class="rules-grid">
+            <div class="rule-btn btn-br" onclick="toggleR('br')"><i class="fas fa-map"></i> BR RANK RULES</div>
+            <div class="rule-btn btn-cs" onclick="toggleR('cs')"><i class="fas fa-users"></i> CS RANK RULES</div>
+            <div class="rule-btn btn-lw" onclick="toggleR('lw')"><i class="fas fa-bolt"></i> LONE WOLF RULES</div>
+        </div>
+        <div id="rule-display-board" class="rule-display-box">রুলস দেখতে উপরের বাটনে ক্লিক করুন...</div>
+    </div>
+
+    <div id="refer" class="page">
+        <p class="page-notice" style="border-left-color: var(--blue);">আপনার নাম্বারটি হলো আপনার রেফার লিং যদি কেউ আইডি খোলার সময় আপনার নাম্বার রেফার হিসাবে ব্যবহার করে তাহলে সে যত টাকা লাভ করবে তত টাকা ৫% আপনাকে আমরা বোনাস করবো।</p>
+        <div class="colored-card" style="flex-direction:column; text-align:center;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h2 id="my-ref-id" style="color:var(--gold); margin:0;">01XXXXXXXXX</h2>
+                <i class="fas fa-copy" onclick="copyText('my-ref-id', 'আপনার রেফার লিং')" style="color:white; cursor:pointer; font-size:1.4rem;"></i>
+            </div>
+            <div style="display:flex; justify-content:space-around; width:100%; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px; margin:10px 0;">
+                <div><small>মোট রেফার</small><br><b id="ref-count">0</b></div>
+                <div><small>মোট ইনকাম</small><br>৳ <b id="ref-earn">0</b></div>
+            </div>
+            <button class="big-btn" style="background:var(--gold); color:black; margin:0;" onclick="copyText('my-ref-id', 'আপনার রেফার লিং')">COPY REFER CODE</button>
+        </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div style="background:var(--deep-green); color:white; padding:20px; border-radius:15px; text-align:center;">
+            <h3 id="p-name">Player</h3>
+            <h1>৳ <span id="p-bal">0</span></h1>
+            <div style="display:flex; gap:8px;">
+                <button class="big-btn" style="background:white; color:black; flex:1; padding:10px;" onclick="nav('addMoneyPage')">Add Money</button>
+                <button class="big-btn" style="background:var(--red); flex:1; padding:10px;" onclick="nav('withdrawPage')">Withdraw</button>
+            </div>
+        </div>
+        <div class="colored-card" onclick="nav('myMatchPage'); loadMyActivity();"><span>My Match</span><i class="fas fa-chevron-right"></i></div>
+        <div class="colored-card" onclick="nav('topPlayerPage'); loadTops();"><span>Top Player</span><i class="fas fa-medal"></i></div>
+        <div class="colored-card" onclick="nav('addMoneyPage')"><span>Add Money</span><i class="fas fa-plus-circle"></i></div>
+        <div class="colored-card" onclick="nav('withdrawPage')"><span>Withdraw</span><i class="fas fa-wallet"></i></div>
+        <div class="colored-card" onclick="nav('devPage')"><span class="txt-dev-btn-name">Developer Shanto</span><i class="fas fa-code"></i></div>
+        <div class="colored-card" onclick="nav('tgPage')"><span class="txt-tg-btn-name">Telegram Join Now</span><i class="fab fa-telegram"></i></div>
+        <button class="big-btn" style="background:linear-gradient(45deg, #ff416c, #ff4b2b); margin-top:20px; border:2px solid #fff;" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <div id="devPage" class="page">
+        <button onclick="nav('profile')"><i class="fas fa-arrow-left"></i> ব্যাক</button>
+        <div style="text-align:center; padding:20px; background:white; border-radius:15px; margin-top:10px;">
+            <i class="fas fa-code-branch" style="font-size:3rem; color:var(--deep-green);"></i>
+            <p style="margin:20px 0; line-height:1.6;">আমাদের মতো এরকুম apps বানাতে চাইলে নিচের <b>Contect to Developer</b> এই বাটনে ক্লিক করে আমাদের সাথে কন্টাক্ট করুন</p>
+            <button class="big-btn btn-dev-link" style="background:var(--blue); display:flex; justify-content:center; align-items:center; gap:10px;">
+                <span class="txt-dev-btn-name">Contect to Developer</span> <i class="fab fa-telegram"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="tgPage" class="page">
+        <button onclick="nav('profile')"><i class="fas fa-arrow-left"></i> ব্যাক</button>
+        <div style="text-align:center; padding:20px; background:white; border-radius:15px; margin-top:10px;">
+            <i class="fab fa-telegram-plane" style="font-size:3.5rem; color:#0088cc;"></i>
+            <p style="margin:20px 0; line-height:1.6;">আমাদের apps সকল আপডেট পেতে আমাদের টেলিগ্রাম চ্যানালে জয়েন করুন,, নিচের <b>telegram join NOW</b> এই বাটনে ক্লিক করুন</p>
+            <button class="big-btn btn-tg-join" style="background:#0088cc; display:flex; justify-content:center; align-items:center; gap:10px;">
+                <span class="txt-tg-btn-name">TELEGRAM JOIN NOW</span> <i class="fab fa-telegram"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="addMoneyPage" class="page">
+        <button onclick="nav('profile')"><i class="fas fa-arrow-left"></i> ব্যাক</button>
+        <p class="page-notice">''add money যেভাবে করবেন:- প্রথমে বিকাশ / নগদ নাম্বারটি কপি করুন, তারপর আপনি বিকাশ/নগদ যেটার মাধ্যমে টাকা পাঠাতে চান সেটা সিলেক্ট করুন, এবং বিকাশ/নগদ থেকে টাকা পাঠান, এবং তারপর আপনি কত টাকা পাঠিয়েছেন  তা লিখুন, তারপর আপনার বিকাশ/নগদ যে নাম্বার থেকে টাকা পাঠিয়েছেন সেই নাম্বারের শেষ ৪ টি সংখ্যা দিন, তারপর সাবমিট করুন</p>
+        <div class="colored-card">
+            <span>বিকাশ/নগদ: <b id="adm-num">...</b></span>
+            <button onclick="copyText('adm-num', 'Deposit নাম্বার')" style="background:var(--gold); border:none; padding:4px 10px; border-radius:5px; color:black; display:flex; align-items:center; gap:5px;">
+                <i class="fas fa-copy"></i> COPY
+            </button>
+        </div>
+        <select id="a-met"><option>Bkash</option><option>Nagad</option></select>
+        <input type="number" id="a-am" placeholder="টাকার পরিমাণ">
+        <input type="number" id="a-ls" placeholder="লাস্ট ৪ সংখ্যা">
+        <button class="big-btn" style="background:var(--green)" onclick="submitDep()">সাবমিট</button>
+    </div>
+
+    <div id="withdrawPage" class="page">
+        <button onclick="nav('profile')"><i class="fas fa-arrow-left"></i> ব্যাক</button>
+        <p class="page-notice" style="border-left-color: var(--red);">যেভাবে উইথড্র করবেন:- প্রথমে আপনি বিকাশ/নগদ যেটার মাধ্যমে টাকা নিতে চান সেটা সিলেক্ট করুন, এবং তারপর আপনি কত টাকা উইথড্র দিতে চান  তা লিখুন, তারপর আপনার বিকাশ/নগদ যে নাম্বার থেকে টাকা উঠাতে চান সেই নাম্বারটি দিন, তারপর সাবমিট করুন।</p>
+        <select id="w-met"><option>Bkash</option><option>Nagad</option></select>
+        <input type="number" id="w-n" placeholder="উইথড্র নাম্বার">
+        <input type="number" id="w-a" placeholder="উইথড্র অ্যামাউন্ট">
+        <button class="big-btn" style="background:var(--red)" onclick="submitWit()">সাবমিট</button>
+    </div>
+
+    <div id="myMatchPage" class="page"><button onclick="nav('profile')">ব্যাক</button><div id="my-activity"></div></div>
+    <div id="topPlayerPage" class="page"><button onclick="nav('profile')">ব্যাক</button><div id="top-3-list"></div></div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-play" onclick="nav('play', this)"><i class="fas fa-gamepad"></i><br>Play</div>
+        <div class="nav-item" onclick="nav('history', this); loadHistory();"><i class="fas fa-history"></i><br>History</div>
+        <div class="nav-item" onclick="nav('rules', this)"><i class="fas fa-book"></i><br>Rules</div>
+        <div class="nav-item" onclick="nav('refer', this)"><i class="fas fa-users"></i><br>Refer</div>
+        <div class="nav-item" onclick="nav('profile', this)"><i class="fas fa-user"></i><br>Profile</div>
+    </nav>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://ff-tournament-64816-default-rtdb.firebaseio.com" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let userPhone = localStorage.getItem('userPhone'), uData = {};
+
+    function copyText(id, msgType) {
+        const text = document.getElementById(id).innerText;
+        const textArea = document.createElement("textarea");
+        textArea.value = text; document.body.appendChild(textArea);
+        textArea.select();
+        try { document.execCommand('copy'); alert(msgType + " কপি করা হয়েছে"); } catch (err) { alert("কপি করা সম্ভব হয়নি"); }
+        document.body.removeChild(textArea);
+    }
+
+    function nav(id, el, push = true) {
+        document.querySelectorAll('.page').forEach(p => p.style.display='none');
+        document.getElementById(id).style.display='block';
+        const catViewVisible = document.getElementById('cat-view').style.display !== 'none';
+        document.getElementById('play-header').style.display = (id==='play' && catViewVisible ? 'block' : 'none');
+        if(push) { history.pushState({page: id}, ""); }
+        if(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
+    }
+
+    window.onpopstate = function() {
+        const currentId = document.querySelector('.page[style*="display: block"]').id;
+        const catViewVisible = document.getElementById('cat-view').style.display !== 'none';
+        if (currentId === 'play' && catViewVisible) {
+            if (navigator.app) { navigator.app.exitApp(); } else { window.close(); }
+        } else if (currentId === 'play' && !catViewVisible) {
+            backToPlay();
+        } else if (['addMoneyPage', 'withdrawPage', 'myMatchPage', 'topPlayerPage', 'devPage', 'tgPage'].includes(currentId)) { 
+            nav('profile'); 
+        } else { 
+            nav('play', document.getElementById('nav-play')); 
+        }
+    };
+
+    /* স্লাইডার ফাংশনালিটি উইথ লিংক সিস্টেম */
+    let slideIndex = 0;
+    let startX = 0, moveX = 0, isDragging = false;
+    let dragStartTime = 0;
+
+    function initSlider() {
+        const wrap = document.getElementById('slider-wrapper');
+        const dotsArea = document.getElementById('slider-dots');
+        const container = document.getElementById('home-slider');
+
+        db.ref('admin/sliders').on('value', s => {
+            wrap.innerHTML = ""; dotsArea.innerHTML = "";
+            s.forEach(snap => {
+                let data = snap.val();
+                let img = document.createElement('img'); 
+                img.src = data.image;
+                // ইমেজ ক্লিক করলে লিংকে যাবে (যদি লিংক থাকে)
+                img.addEventListener('click', () => {
+                    if (data.link && data.link !== "" && Math.abs(moveX) < 10) {
+                        window.location.href = data.link;
+                    }
+                });
+                wrap.appendChild(img);
+                let dot = document.createElement('div'); dot.className = "dot"; dotsArea.appendChild(dot);
+            });
+            updateSlider();
+        });
+
+        setInterval(() => { 
+            if(!isDragging && wrap.children.length > 1) { 
+                slideIndex = (slideIndex + 1) % wrap.children.length; 
+                updateSlider(); 
+            } 
+        }, 3500);
+
+        container.addEventListener('touchstart', (e) => { 
+            startX = e.touches[0].clientX; 
+            isDragging = true; 
+            dragStartTime = Date.now();
+            wrap.style.transition = 'none'; 
+            moveX = 0;
+        });
+        
+        container.addEventListener('touchmove', (e) => { 
+            if (!isDragging) return; 
+            moveX = e.touches[0].clientX - startX; 
+            wrap.style.transform = `translateX(${(slideIndex * -wrap.offsetWidth) + moveX}px)`; 
+        });
+        
+        container.addEventListener('touchend', (e) => { 
+            isDragging = false; 
+            wrap.style.transition = 'transform 0.4s ease-out';
+            if (moveX < -80 && slideIndex < wrap.children.length - 1) slideIndex++;
+            else if (moveX > 80 && slideIndex > 0) slideIndex--;
+            updateSlider();
+        });
+    }
+
+    function updateSlider() {
+        const wrap = document.getElementById('slider-wrapper');
+        if(!wrap || wrap.children.length === 0) return;
+        wrap.style.transform = `translateX(${slideIndex * -wrap.offsetWidth}px)`;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === slideIndex));
+    }
+
+    function loadMatches(cat) {
+        document.getElementById('cat-view').style.display='none';
+        document.getElementById('play-header').style.display='none';
+        document.getElementById('match-view').style.display='block';
+        db.ref('matchCounter').once('value', countSnap => {
+            let baseNum = countSnap.val() || 0;
+            db.ref('tournaments').orderByChild('category').equalTo(cat).on('value', s => {
+                const area = document.getElementById('matches-here'); area.innerHTML = "";
+                let i = 1;
+                s.forEach(c => {
+                    const m = c.val(), joined = m.joinedPlayers ? Object.keys(m.joinedPlayers).length : 0;
+                    area.innerHTML += `
+                    <div class="match-card">
+                        <div class="m-header"><span>📅 ${m.time.split('T')[0]}</span><b>#${baseNum + i}</b><span>⏰ ${m.time.split('T')[1]}</span></div>
+                        <div style="padding:10px; text-align:center;"><b>${m.title}</b></div>
+                        <div class="m-info-grid"><span>Entry Fee: ৳${m.fee}</span><span>${cat==='br' ? 'Per Kill: ৳'+m.perKill : 'Survival'}</span><span style="grid-column: span 2; text-align:center;">Slots: ${joined}/${m.slots}</span></div>
+                        <div id="t-${c.key}" style="text-align:center; color:var(--gold); font-family:Orbitron;">লোড হচ্ছে...</div>
+                        <div class="prize-btn" onclick="toggleP('${c.key}')">PRIZE MONEY</div>
+                        <div id="p-${c.key}" class="prize-details">${m.prize}</div>
+                        <div style="display:flex; gap:8px; padding:0 12px 12px;">
+                            <button class="big-btn" style="flex:1; background:var(--blue); margin:0;" onclick="checkR('${c.key}')">ROOM</button>
+                            <button class="big-btn" style="flex:1; background:var(--green); margin:0;" onclick="joinM('${c.key}',${m.fee},${m.slots},${joined},'${m.time}')">JOIN</button>
+                        </div>
+                    </div>`;
+                    startT(c.key, m.time); i++;
+                });
+            });
+        });
+    }
+
+    function backToPlay() { document.getElementById('match-view').style.display='none'; document.getElementById('cat-view').style.display='block'; document.getElementById('play-header').style.display='block'; }
+
+    function joinM(id, fee, max, current, start) {
+        if(new Date(start).getTime() <= Date.now()) return alert("দুঃখিত! এই ম্যাচের সময় শেষ হয়ে গেছে।");
+        if(current >= max) return alert("এই ম্যাচের স্লট ফুল হয়ে গেছে! অন্য ম্যাচে চেষ্টা করুন।");
+        if(uData.balance < fee) return alert("আপনার একাউন্টে পর্যাপ্ত ব্যালেন্স নেই। দয়া করে টাকা এড করুন।");
+        db.ref('tournaments/'+id).once('value', s => {
+            if(s.val().joinedPlayers && s.val().joinedPlayers[userPhone]) return alert("আপনি ইতিমধ্যে এই ম্যাচে জয়েন করে আছেন।");
+            const gName = prompt("গেম থেকে আপনার গেম আইডির নাম টি কপি করে এনে এখানে পেস্ট করুন। ভুল নাম দিলে রুম থেকে কিক দেওয়া হবে।");
+            if(gName) {
+                db.ref('tournaments/'+id+'/joinedPlayers/'+userPhone).set({gameName: gName});
+                db.ref('users/'+userPhone+'/balance').transaction(b => b - fee);
+                document.getElementById('tg-modal').style.display = 'flex';
+            }
+        });
+    }
+
+    function checkR(id) {
+        db.ref('tournaments/'+id).once('value', s => {
+            const m = s.val();
+            if(!m.joinedPlayers || !m.joinedPlayers[userPhone]) return alert("আপনি এই ম্যাচে জয়েন নেই তাই আপনি রুম পাসওয়ার্ড দেখতে পারবেন না।");
+            if(!m.roomId) return alert("রুম আইডি এবং পাসওয়ার্ড এখানো দেওয়া হয় নাই। ম্যাচ শুরু হওয়ার ২-৫ মিনিটের মধ্যে দেওয়া হবে।");
+            alert("✅ রুম আইডি: " + m.roomId + "\n🔑 পাসওয়ার্ড: " + m.roomPass);
+        });
+    }
+
+    function submitWit() { 
+        const a = Number(document.getElementById('w-a').value), now = Date.now();
+        if (uData.lastWithdrawTime && (now - uData.lastWithdrawTime < 86400000)) return alert("২৪ ঘণ্টায় একবার উইথড্র সম্ভব।");
+        if(uData.balance < a) return alert("ব্যালেন্স নেই!"); 
+        db.ref('withdrawRequests').push({ phone: userPhone, amount: a, number: document.getElementById('w-n').value, method: document.getElementById('w-met').value, status: 'Pending', timestamp: now }); 
+        db.ref('users/'+userPhone).update({ balance: uData.balance - a, lastWithdrawTime: now }); 
+        alert("সফল!"); 
+    }
+
+    function login() { const p = document.getElementById('l-phone').value, ps = document.getElementById('l-pass').value; db.ref('users/'+p).once('value', s => { if(s.exists() && s.val().pass === ps) { localStorage.setItem('userPhone', p); location.reload(); } else alert("ভুল তথ্য"); }); }
+    
+    function register() { 
+        const p = document.getElementById('r-phone').value, ps = document.getElementById('r-pass').value, rf = document.getElementById('r-ref').value; 
+        if(p.length !== 11) return alert("১১ ডিজিট দিন"); 
+        db.ref('users/'+p).set({ name:document.getElementById('r-name').value, phone:p, pass:ps, balance:0, totalWin:0, refCount:0, refEarn:0 }).then(() => { 
+            if(rf && rf.length===11 && rf !== p) { 
+                db.ref('users/'+rf).transaction(user => {
+                    if (user) {
+                        user.refCount = (user.refCount || 0) + 1;
+                        user.balance = (user.balance || 0) + 5;
+                        user.refEarn = (user.refEarn || 0) + 5;
+                    }
+                    return user;
+                });
+            } 
+            alert("রেজিস্ট্রেশন সফল!"); toggleAuth('login'); 
+        }); 
+    }
+
+    function toggleR(type) {
+        const board = document.getElementById('rule-display-board');
+        board.style.display = 'block';
+        board.innerText = "লোড হচ্ছে...";
+        if(type === 'br') board.style.borderLeftColor = "#f5576c";
+        if(type === 'cs') board.style.borderLeftColor = "#4568dc";
+        if(type === 'lw') board.style.borderLeftColor = "#ff4e50";
+        db.ref('admin/rules/' + type).once('value', s => board.innerText = s.val() || "রুলস সেট করা হয়নি।");
+    }
+
+    function initApp() {
+        initSlider();
+        db.ref('users/'+userPhone).on('value', s => {
+            uData = s.val() || {};
+            document.getElementById('u-bal').innerText = uData.balance || 0;
+            document.getElementById('p-bal').innerText = uData.balance || 0;
+            document.getElementById('p-name').innerText = uData.name;
+            document.getElementById('my-ref-id').innerText = userPhone;
+            document.getElementById('ref-count').innerText = uData.refCount || 0;
+            document.getElementById('ref-earn').innerText = uData.refEarn || 0;
+        });
+        db.ref('admin/notice').on('value', s => { if(s.exists()) document.getElementById('admin-notice').innerText = s.val(); });
+        db.ref('admin/settings/adminNumber').on('value', s => document.getElementById('adm-num').innerText = s.val());
+        db.ref('admin/buttons').on('value', s => {
+            const d = s.val() || {};
+            document.querySelectorAll('.btn-tg-join').forEach(b => b.onclick = () => window.location.href = d.tgJoinLink || '#');
+            document.querySelectorAll('.btn-support-admin').forEach(b => b.onclick = () => window.location.href = d.supportLink || '#');
+            document.querySelectorAll('.btn-dev-link').forEach(b => b.onclick = () => window.location.href = d.devLink || '#');
+        });
+    }
+
+    function logout() { localStorage.clear(); location.reload(); }
+    function toggleAuth(t) { document.getElementById('login-form').style.display = t==='reg'?'none':'block'; document.getElementById('reg-form').style.display = t==='reg'?'block':'none'; }
+    function startT(id, target) { setInterval(() => { const diff = new Date(target).getTime() - Date.now(); const el = document.getElementById('t-'+id); if(el) el.innerText = diff < 0 ? "ম্যাচ শুরু হয়েছে" : "বাকি: " + Math.floor(diff/3600000) + "h " + Math.floor((diff%3600000)/60000) + "m"; }, 1000); }
+    function toggleP(id) { const el = document.getElementById('p-'+id); el.style.display = (el.style.display==='block'?'none':'block'); }
+    function submitDep() { db.ref('depositRequests').push({ phone:userPhone, amount:document.getElementById('a-am').value, last4:document.getElementById('a-ls').value, status:'Pending' }); alert("সাবমিট হয়েছে"); }
+    function loadHistory() { db.ref('withdrawRequests').orderByChild('phone').equalTo(userPhone).once('value', s => { const l = document.getElementById('all-history-list'); l.innerHTML = ""; s.forEach(h => l.innerHTML += `<div class="colored-card"><span>Withdraw ৳${h.val().amount}</span><b>${h.val().status}</b></div>`); }); }
+    function loadMyActivity() { db.ref('users/'+userPhone+'/totalWin').on('value', s => document.getElementById('my-activity').innerHTML = `<div class="colored-card"><h3>মোট জয়ী: ${s.val() || 0} টি</h3></div>`); }
+    function loadTops() { const a = document.getElementById('top-3-list'); a.innerHTML = ""; db.ref('users').orderByChild('totalWin').limitToLast(3).once('value', s => { let list = []; s.forEach(u => list.push(u.val())); list.reverse().forEach((p, i) => a.innerHTML += `<div class="colored-card"><b>${i+1}. ${p.name}</b> <span>${p.totalWin || 0} Wins</span></div>`); }); }
+    function closeTgModal() { document.getElementById('tg-modal').style.display = 'none'; backToPlay(); }
+
+    if(userPhone) { document.getElementById('auth-screen').style.display='none'; document.getElementById('main-app').style.display='block'; initApp(); history.pushState({page: 'play'}, ""); }
+</script>
+</body>
+</html>
